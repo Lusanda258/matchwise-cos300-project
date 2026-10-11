@@ -75,7 +75,7 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 interface MatchResult {
-  match_id: string;
+  id: string;
   provider_id: string;
   score: number;
   reason: string;
@@ -983,7 +983,7 @@ function ClientDashboard() {
                                   )}
                                 </div>
                                 <div>
-                                  {requestedIds.has(m.match_id) ? (
+                                  {requestedIds.has(m.id) ? (
                                     <Badge className="bg-success text-success-foreground px-3 py-1 text-sm">
                                       Request sent
                                     </Badge>
@@ -1016,10 +1016,10 @@ function ClientDashboard() {
                 <ProviderInquiryDialog
                   open={!!inquiryTarget}
                   onOpenChange={(open) => !open && setInquiryTarget(null)}
-                  matchId={inquiryTarget.match_id}
+                  matchId={inquiryTarget.id}
                   providerName={inquiryTarget.provider.business_name}
                   onSuccess={() => {
-                    setRequestedIds((prev) => new Set(prev).add(inquiryTarget.match_id));
+                    setRequestedIds((prev) => new Set(prev).add(inquiryTarget.id));
                     queryClient.invalidateQueries({ queryKey: ["allPastRequests"] });
                   }}
                 />

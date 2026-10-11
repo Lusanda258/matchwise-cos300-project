@@ -24,6 +24,14 @@ interface ProviderInquiryDialogProps {
   onSuccess: () => void;
 }
 
+// MatchResult interface for the inquiry target
+interface MatchResult {
+  id: string;
+  provider: {
+    business_name: string;
+  };
+}
+
 export function ProviderInquiryDialog({
   open,
   onOpenChange,
