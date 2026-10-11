@@ -85,7 +85,7 @@ export const matchRequest = createServerFn({ method: "POST" })
     let savedMatches: { id: string; provider_id: string; score: number; reason: string | null }[] = [];
 
     if (validMatches.length) {
-      const { data: inserted } = await supabaseAdmin
+      const { data: inserted, error: insertError } = await supabaseAdmin
         .from("matches")
         .insert(
           validMatches.map(r => ({
@@ -99,6 +99,10 @@ export const matchRequest = createServerFn({ method: "POST" })
           }))
         )
         .select("id, provider_id, score, reason");
+
+      if (insertError) {
+        throw new Error(`Failed to save matches: ${insertError.message}`);
+      }
 
       savedMatches = inserted ?? [];
     }
