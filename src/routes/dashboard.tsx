@@ -176,7 +176,7 @@ function ClientDashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showMobileStats, setShowMobileStats] = useState(false);
 
-  // Check if user needs onboarding (disabled - user_profiles table doesn't exist)
+  // Check if user needs onboarding (disabled - profiles table doesn't have onboarding_completed column)
   // useEffect(() => {
   //   const checkOnboarding = async () => {
   //     const {
@@ -185,9 +185,9 @@ function ClientDashboard() {
   //     if (!user) return;
 
   //     const { data: profile } = await supabase
-  //       .from("user_profiles")
+  //       .from("profiles")
   //       .select("onboarding_completed")
-  //       .eq("user_id", user.id)
+  //       .eq("id", user.id)
   //       .single();
 
   //     if (profile && !profile.onboarding_completed) {
