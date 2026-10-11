@@ -176,27 +176,27 @@ function ClientDashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showMobileStats, setShowMobileStats] = useState(false);
 
-  // Check if user needs onboarding
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+  // Check if user needs onboarding (disabled - user_profiles table doesn't exist)
+  // useEffect(() => {
+  //   const checkOnboarding = async () => {
+  //     const {
+  //       data: { user },
+  //     } = await supabase.auth.getUser();
+  //     if (!user) return;
 
-      const { data: profile } = await supabase
-        .from("user_profiles")
-        .select("onboarding_completed")
-        .eq("user_id", user.id)
-        .single();
+  //     const { data: profile } = await supabase
+  //       .from("user_profiles")
+  //       .select("onboarding_completed")
+  //       .eq("user_id", user.id)
+  //       .single();
 
-      if (profile && !profile.onboarding_completed) {
-        setShowOnboarding(true);
-      }
-    };
+  //     if (profile && !profile.onboarding_completed) {
+  //       setShowOnboarding(true);
+  //     }
+  //   };
 
-    checkOnboarding();
-  }, []);
+  //   checkOnboarding();
+  // }, []);
 
   // Initialize Web Speech API
   useEffect(() => {
