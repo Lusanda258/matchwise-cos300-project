@@ -992,7 +992,13 @@ function ClientDashboard() {
                                       size="sm"
                                       className="bg-gradient-hero text-white shadow-md hover:shadow-lg transition-all"
                                       disabled={!m.match_id}
-                                      onClick={() => setInquiryTarget(m)}
+                                      onClick={() => {
+                                        if (!m.match_id) {
+                                          toast.error("Match data not saved. Please try searching again.");
+                                          return;
+                                        }
+                                        setInquiryTarget(m);
+                                      }}
                                     >
                                       Request this provider
                                     </Button>
