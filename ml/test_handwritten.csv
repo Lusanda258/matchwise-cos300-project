@@ -1,0 +1,67 @@
+text,label
+"There's a wet patch spreading on my lounge floor and I suspect the pipes under the tiles",plumbing
+"Anyone good with taps? Mine won't stop dripping in Pretoria",plumbing
+"our bathroom sink is clogged with hair and nothing helps",plumbing
+"Need a plumber to put in a new shower mixer",plumbing
+"Whole street is fine but my plugs have no power at all",electrical
+"need an electrician to add extra sockets in my home office in Midrand",electrical
+"the stove tripped the whole house again, can someone check the wiring",electrical
+"I want LED downlights fitted in the lounge",electrical
+"Looking for a maid to come clean my flat every Friday in Sandton",cleaning
+"after the party the house is a disaster and I need a cleaning crew",cleaning
+"can someone sanitise and scrub my restaurant kitchen overnight",cleaning
+"I need my sofas shampooed and the carpets vacuumed",cleaning
+"Need a gardener who can take care of my yard twice a month",gardening
+"my palm tree is too tall and needs to be chopped down",gardening
+"Looking for someone to put in new turf and flower beds in Durban",gardening
+"the weeds took over my whole front lawn",gardening
+"I would like to freshen up my bedroom with a new colour, who paints?",painting
+"need the outside of my townhouse repainted before winter",painting
+"someone to coat my corrugated iron roof with a new paint colour",painting
+"ceiling has water stains, need it fixed and repainted",painting
+"I want a bespoke wooden table made for my dining room",carpentry
+"the cupboard doors in my kitchen are broken and need replacing by a joiner",carpentry
+"Need a handyman who is good with timber to build a gazebo",carpentry
+"our wooden staircase creaks and some steps are cracked",carpentry
+"my grade 11 daughter needs help with maths twice a week in Centurion",tutoring
+"looking for someone to coach me for my university economics exam",tutoring
+"private lessons for my 8 year old who struggles with reading",tutoring
+"anyone teaching python to beginners online",tutoring
+"We are shifting to a new flat in Cape Town and need a van and two guys",moving
+"need to ship a wardrobe and a bed from Bloemfontein to Polokwane",moving
+"looking for removal company quotes for a three bedroom house",moving
+"Can I hire a truck with a driver for Saturday to carry my stuff?",moving
+"my washing machine is flooding the laundry and won't spin",appliance_repair
+"the fridge freezer has stopped cooling and the food is going off",appliance_repair
+"Need a technician to service my air conditioner before summer",appliance_repair
+"my tv screen has lines across it, can anyone repair it?",appliance_repair
+"I need my car serviced and the oil changed",car_mechanic
+"My bakkie is making a grinding sound when I brake",car_mechanic
+"Looking for a mechanic who can fix a leaking radiator in Soweto",car_mechanic
+"car refuses to start and the battery light is on",car_mechanic
+"Looking for someone to plait my hair this weekend",hair_beauty
+"I need a makeup artist for my sister's wedding in Durban",hair_beauty
+"anyone doing acrylic nails and pedicures at home?",hair_beauty
+"I need a barber for my father who cannot leave the house",hair_beauty
+"my laptop is crawling and I think it is infected",it_support
+"need a developer to build an online shop for my clothing brand",it_support
+"can someone set up a wifi router and connect my devices",it_support
+"my phone screen is smashed and needs replacing",it_support
+"I need a photographer for my engagement shoot in Stellenbosch",photography
+"Looking for a videographer to film our wedding ceremony",photography
+"need good pictures of my restaurant dishes for the menu",photography
+"book a photo session for my graduation",photography
+"We need an alarm and cameras installed at our shop",security
+"looking for armed response and an electric fence for my house",security
+"need guards for my building site at night",security
+"my gate motor is dead and the gate is stuck open",security
+"I need food for 100 guests at my wedding reception",catering
+"who can bake a three tier cake for my daughter's birthday",catering
+"we want a chef to prepare lunch for our staff on Friday",catering
+"looking for a caterer for a funeral in Soshanguve",catering
+"how do I change my profile picture",other
+"what is the price of petrol",other
+"I just want to say hi",other
+"asdfgh jkl",other
+"can you help me with my taxes",other
+"where do I find the latest news about the election",other

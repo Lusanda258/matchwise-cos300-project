@@ -1,0 +1,19 @@
+name: Process Email Queue
+
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  process-emails:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Process Email Queue
+        run: |
+          curl -X POST \
+            https://luupujpqzuklrhcrdboy.supabase.co/functions/v1/send-emails \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json"

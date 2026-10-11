@@ -1,0 +1,34 @@
+TEST 1 - held-out part of generated data: accuracy 0.997  (optimistic: same style as training)
+TEST 2 - hand-written exam (66 sentences): accuracy 0.955  <- the honest number
+
+Per-class results on the hand-written exam:
+                  precision    recall  f1-score   support
+
+appliance_repair       1.00      0.75      0.86         4
+    car_mechanic       1.00      1.00      1.00         4
+       carpentry       0.80      1.00      0.89         4
+        catering       1.00      1.00      1.00         4
+        cleaning       1.00      1.00      1.00         4
+      electrical       1.00      1.00      1.00         4
+       gardening       1.00      1.00      1.00         4
+     hair_beauty       0.80      1.00      0.89         4
+      it_support       0.80      1.00      0.89         4
+          moving       1.00      0.75      0.86         4
+           other       1.00      1.00      1.00         6
+        painting       1.00      1.00      1.00         4
+     photography       1.00      1.00      1.00         4
+        plumbing       1.00      0.75      0.86         4
+        security       1.00      1.00      1.00         4
+        tutoring       1.00      1.00      1.00         4
+
+        accuracy                           0.95        66
+       macro avg       0.96      0.95      0.95        66
+    weighted avg       0.96      0.95      0.95        66
+
+Mistakes:
+                                                            text            label   predicted
+        our bathroom sink is clogged with hair and nothing helps         plumbing hair_beauty
+need to ship a wardrobe and a bed from Bloemfontein to Polokwane           moving   carpentry
+         my tv screen has lines across it, can anyone repair it? appliance_repair  it_support
+
+Model file service_model.json: 1673 KB, 4991 word features + 8706 character features, 16 classes
