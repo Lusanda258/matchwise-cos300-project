@@ -991,7 +991,6 @@ function ClientDashboard() {
                                     <Button
                                       size="sm"
                                       className="bg-gradient-hero text-white shadow-md hover:shadow-lg transition-all"
-                                      disabled={!m.match_id}
                                       onClick={() => setInquiryTarget(m)}
                                     >
                                       Request this provider
