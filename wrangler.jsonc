@@ -6,6 +6,11 @@
   "main": "@tanstack/react-start/server-entry",
   "vars": {
     "VITE_SUPABASE_URL": "https://xhzqrepfujmvnxphpqzt.supabase.co",
-    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_6pAIGptdFv3BxRUY7N37jw_6K1xy3Dt"
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_6pAIGptdFv3BxRUY7N37jw_6K1xy3Dt",
+    "VITE_SUPABASE_PROJECT_ID": "xhzqrepfujmvnxphpqzt",
+    "VITE_REGISTRATION_SUPABASE_URL": "https://mzrdtpwlqtsjctofpmlb.supabase.co",
+    "VITE_REGISTRATION_SUPABASE_KEY": "sb_publishable_UDVId3Pb5nP4SRuNNM43Bg_TLMQ0BMR",
+    "REGISTRATION_SUPABASE_URL": "https://mzrdtpwlqtsjctofpmlb.supabase.co",
+    "REGISTRATION_SUPABASE_KEY": "sb_publishable_UDVId3Pb5nP4SRuNNM43Bg_TLMQ0BMR"
   }
 }
