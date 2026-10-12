@@ -11,21 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
   SidebarProvider,
   Sidebar,
   SidebarContent,
@@ -53,9 +38,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { deleteAccount } from "@/server/account.functions";
-import { submitSupportMessage, getUserSupportMessages } from "@/server/support.functions";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRealtimeSubscription } from "@/hooks/useRealtime";
 
 export const Route = createFileRoute("/settings")({
   component: () => (
@@ -86,12 +68,6 @@ function SettingsPage() {
   // Privacy settings
   const [profileVisible, setProfileVisible] = useState(true);
   const [showLocation, setShowLocation] = useState(true);
-
-  // Support dialog
-  const [supportDialogOpen, setSupportDialogOpen] = useState(false);
-  const [supportSubject, setSupportSubject] = useState("");
-  const [supportMessage, setSupportMessage] = useState("");
-  const [supportPriority, setSupportPriority] = useState("medium");
 
   // Load user data
   useEffect(() => {
@@ -249,68 +225,6 @@ function SettingsPage() {
     }
   };
 
-  // Submit support message
-  const submitSupportMutation = useMutation({
-    mutationFn: async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) throw new Error("Not authenticated");
-
-      const res = await submitSupportMessage({
-        data: {
-          subject: supportSubject,
-          message: supportMessage,
-          priority: supportPriority,
-        },
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      return res;
-    },
-    onSuccess: () => {
-      toast.success("Support message sent successfully. We'll get back to you soon.");
-      setSupportDialogOpen(false);
-      setSupportSubject("");
-      setSupportMessage("");
-      setSupportPriority("medium");
-    },
-    onError: (err) => {
-      toast.error(err instanceof Error ? err.message : "Failed to send support message");
-    },
-  });
-
-  const handleSupportSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitSupportMutation.mutate();
-  };
-
-  // Fetch user's support messages
-  const { data: supportMessages = [], refetch: refetchSupportMessages } = useQuery({
-    queryKey: ["userSupportMessages"],
-    queryFn: async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) return [];
-
-      const res = await getUserSupportMessages({
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      return res;
-    },
-  });
-
-  // Real-time subscription for support messages
-  useRealtimeSubscription({
-    table: "support_messages",
-    onInsert: () => {
-      refetchSupportMessages();
-    },
-    onUpdate: () => {
-      refetchSupportMessages();
-    },
-  });
-
   const dashboardLink =
     role === "admin" ? "/admin" : role === "provider" ? "/provider" : "/dashboard";
 
@@ -377,6 +291,12 @@ function SettingsPage() {
                       <SidebarMenuButton onClick={() => navigate({ to: "/how-it-works" })}>
                         <HelpCircle className="w-4 h-4" />
                         <span>How It Works</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton onClick={() => navigate({ to: "/contact-support" })}>
+                        <MessageSquare className="w-4 h-4" />
+                        <span>Contact Support</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </SidebarMenu>
@@ -597,67 +517,6 @@ function SettingsPage() {
                     </div>
                   </Card>
 
-                  {/* Support Section */}
-                  <Card className="p-6 shadow-card border-2 border-primary/20">
-                    <div className="flex items-center gap-2 mb-6">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <MessageSquare className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-semibold">Contact Support</h2>
-                        <p className="text-sm text-muted-foreground">
-                          Need help? Send us a message.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <Button
-                        onClick={() => setSupportDialogOpen(true)}
-                        variant="outline"
-                        className="w-full sm:w-auto border-2"
-                      >
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Contact Support
-                      </Button>
-
-                      {supportMessages.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Your Support Requests</p>
-                          {supportMessages.slice(0, 3).map((msg) => (
-                            <Card key={msg.id} className="p-3 border-2">
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium">{msg.subject}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {new Date(msg.created_at).toLocaleDateString()}
-                                  </p>
-                                </div>
-                                <Badge
-                                  variant={
-                                    msg.status === "resolved"
-                                      ? "default"
-                                      : msg.status === "in_progress"
-                                        ? "secondary"
-                                        : "outline"
-                                  }
-                                >
-                                  {msg.status}
-                                </Badge>
-                              </div>
-                              {msg.admin_response && (
-                                <div className="mt-2 p-2 bg-muted rounded text-xs">
-                                  <p className="font-medium text-muted-foreground mb-1">Admin Response:</p>
-                                  <p className="text-foreground">{msg.admin_response}</p>
-                                </div>
-                              )}
-                            </Card>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-
                   {/* Account Actions */}
                   <Card className="p-6 shadow-card border-2 border-destructive/20">
                     <div className="flex items-center gap-2 mb-6">
@@ -763,7 +622,7 @@ function SettingsPage() {
                         size="sm"
                         variant="outline"
                         className="w-full text-xs"
-                        onClick={() => setSupportDialogOpen(true)}
+                        onClick={() => navigate({ to: "/contact-support" })}
                       >
                         Contact Support
                       </Button>
@@ -775,65 +634,6 @@ function SettingsPage() {
           </aside>
         </div>
       </div>
-
-      {/* Support Dialog */}
-      <Dialog open={supportDialogOpen} onOpenChange={setSupportDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Contact Support</DialogTitle>
-            <DialogDescription>
-              Send a message to our support team. We'll get back to you as soon as possible.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSupportSubmit} className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="support-subject">Subject</Label>
-              <Input
-                id="support-subject"
-                placeholder="Brief description of your issue"
-                value={supportSubject}
-                onChange={(e) => setSupportSubject(e.target.value)}
-                required
-                minLength={5}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="support-priority">Priority</Label>
-              <Select value={supportPriority} onValueChange={setSupportPriority}>
-                <SelectTrigger id="support-priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low - General inquiry</SelectItem>
-                  <SelectItem value="medium">Medium - Need assistance</SelectItem>
-                  <SelectItem value="high">High - Issue affecting usage</SelectItem>
-                  <SelectItem value="urgent">Urgent - Critical issue</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="support-message">Message</Label>
-              <Textarea
-                id="support-message"
-                placeholder="Describe your issue in detail..."
-                value={supportMessage}
-                onChange={(e) => setSupportMessage(e.target.value)}
-                required
-                minLength={10}
-                rows={4}
-              />
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setSupportDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={submitSupportMutation.isPending}>
-                {submitSupportMutation.isPending ? "Sending..." : "Send Message"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </SidebarProvider>
   );
 }
