@@ -24,14 +24,6 @@ export function Footer() {
             <Link to="/how-it-works" className="hover:text-foreground transition-smooth font-medium">How it works</Link>
             <Link to="/providers" className="hover:text-foreground transition-smooth font-medium">Providers</Link>
             <Link to="/auth" className="hover:text-foreground transition-smooth font-medium">Sign up</Link>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Support</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Documentation</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">API Reference</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Blog</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Terms of Service</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Cookie Policy</span>
-            <span className="hover:text-foreground transition-smooth cursor-pointer">Security</span>
           </div>
 
           {/* Bottom info */}
