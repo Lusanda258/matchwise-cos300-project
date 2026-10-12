@@ -626,7 +626,7 @@ function SettingsPage() {
                           <p className="text-sm font-medium">Your Support Requests</p>
                           {supportMessages.slice(0, 3).map((msg) => (
                             <Card key={msg.id} className="p-3 border-2">
-                              <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-start justify-between gap-2 mb-2">
                                 <div className="flex-1">
                                   <p className="text-sm font-medium">{msg.subject}</p>
                                   <p className="text-xs text-muted-foreground mt-1">
@@ -645,6 +645,12 @@ function SettingsPage() {
                                   {msg.status}
                                 </Badge>
                               </div>
+                              {msg.admin_response && (
+                                <div className="mt-2 p-2 bg-muted rounded text-xs">
+                                  <p className="font-medium text-muted-foreground mb-1">Admin Response:</p>
+                                  <p className="text-foreground">{msg.admin_response}</p>
+                                </div>
+                              )}
                             </Card>
                           ))}
                         </div>
@@ -757,9 +763,9 @@ function SettingsPage() {
                         size="sm"
                         variant="outline"
                         className="w-full text-xs"
-                        onClick={() => navigate({ to: "/how-it-works" })}
+                        onClick={() => setSupportDialogOpen(true)}
                       >
-                        View Help Center
+                        Contact Support
                       </Button>
                     </div>
                   </div>

@@ -1362,9 +1362,9 @@ function ProviderDashboard() {
                         size="sm"
                         variant="outline"
                         className="w-full text-xs"
-                        onClick={() => navigate({ to: "/how-it-works" })}
+                        onClick={() => navigate({ to: "/settings" })}
                       >
-                        View How It Works
+                        Contact Support
                       </Button>
                     </div>
                   </div>

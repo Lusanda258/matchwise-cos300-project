@@ -42,6 +42,13 @@ CREATE TRIGGER update_support_messages_updated_at BEFORE UPDATE ON support_messa
 -- Enable RLS
 ALTER TABLE support_messages ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (for idempotent migration)
+DROP POLICY IF EXISTS "Users can create support messages" ON support_messages;
+DROP POLICY IF EXISTS "Users can view own support messages" ON support_messages;
+DROP POLICY IF EXISTS "Admins can view all support messages" ON support_messages;
+DROP POLICY IF EXISTS "Admins can update support messages" ON support_messages;
+DROP POLICY IF EXISTS "Admins can delete support messages" ON support_messages;
+
 -- Policy: Users can create support messages
 CREATE POLICY "Users can create support messages" ON support_messages
   FOR INSERT TO authenticated
