@@ -63,6 +63,7 @@ import {
   Mic,
   MicOff,
   ChevronDown,
+  XCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
@@ -808,6 +809,12 @@ function ClientDashboard() {
                       </span>
                     </div>
                     <div className="flex justify-between">
+                      <span className="opacity-80">Declined:</span>
+                      <span className="font-medium">
+                        {clientMatches.filter((m) => m.inquiry_status === "declined").length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="opacity-80">Favorites:</span>
                       <span className="font-medium">{favoriteProviders.length}</span>
                     </div>
@@ -1375,6 +1382,82 @@ function ClientDashboard() {
                 </section>
               )}
 
+              {/* Declined Matches Section */}
+              {clientMatches.filter((m) => m.inquiry_status === "declined").length > 0 && (
+                <section id="declined-requests" className="mt-8 fade-in">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive text-destructive-foreground">
+                      <XCircle className="w-4 h-4" />
+                    </div>
+                    <h2 className="text-xl font-semibold">Declined Requests</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Requests that providers have declined.
+                  </p>
+                  <div className="space-y-3">
+                    {clientMatches
+                      .filter((m) => m.inquiry_status === "declined")
+                      .map((match) => (
+                        <Card
+                          key={match.id}
+                          className="p-5 shadow-card border-2 border-destructive/20"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="font-semibold text-lg">
+                                  {match.provider?.business_name || "Unknown"}
+                                </h3>
+                                {match.provider && (
+                                  <Badge variant="secondary" className="font-medium">
+                                    {match.provider.category}
+                                  </Badge>
+                                )}
+                                <Badge className="bg-destructive text-destructive-foreground px-2 py-0.5 text-xs font-medium">
+                                  Declined
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-3">{match.reason}</p>
+                              {match.provider && (
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                                  {match.provider.location && (
+                                    <span className="flex items-center gap-1">
+                                      <span className="font-medium">📍</span>{" "}
+                                      {match.provider.location}
+                                    </span>
+                                  )}
+                                  <span className="flex items-center gap-1">
+                                    <span className="font-medium">⭐</span>{" "}
+                                    {(match.provider.avg_rating ?? 0).toFixed(1)} (
+                                    {match.provider.rating_count ?? 0})
+                                  </span>
+                                  {match.provider.hourly_rate && (
+                                    <span className="flex items-center gap-1">
+                                      <span className="font-medium">💰</span> R
+                                      {match.provider.hourly_rate}/hr
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => navigate({ to: `/providers` })}
+                                className="bg-gradient-hero text-white border-0"
+                              >
+                                <Sparkles className="w-4 h-4 mr-1" />
+                                Find Other Providers
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
+                </section>
+              )}
+
               {/* Report Provider Dialog */}
               <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
                 <DialogContent>
@@ -1781,6 +1864,12 @@ function ClientDashboard() {
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">Completed</div>
                       </Card>
+                      <Card className="p-4 text-center shadow-card border-2 border-destructive/20">
+                        <div className="text-2xl font-bold text-destructive">
+                          {clientMatches.filter((m) => m.inquiry_status === "declined").length}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">Declined</div>
+                      </Card>
                     </div>
                     <Card className="p-4 shadow-card border-2 border-accent/20 bg-accent/5">
                       <div className="flex items-start gap-3">
@@ -1830,6 +1919,12 @@ function ClientDashboard() {
                       {clientMatches.filter((m) => m.inquiry_status === "completed").length}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">Completed</div>
+                  </Card>
+                  <Card className="p-4 text-center shadow-card border-2 border-destructive/20">
+                    <div className="text-2xl font-bold text-destructive">
+                      {clientMatches.filter((m) => m.inquiry_status === "declined").length}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">Declined</div>
                   </Card>
                 </div>
               </div>

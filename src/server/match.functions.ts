@@ -38,12 +38,16 @@ export const matchRequest = createServerFn({ method: "POST" })
 
 
     // 2. Pull verified providers
-    const { data: providers } = await supabaseAdmin
+    const { data: providers, error: providerError } = await supabaseAdmin
       .from("service_providers")
       .select(
         "id, business_name, category, bio, location, hourly_rate, avg_rating, rating_count, status, verification_status"
       )
       .eq("verification_status", "verified");
+
+    if (providerError) {
+      throw new Error(`Failed to fetch providers: ${providerError.message}`);
+    }
 
 
     const providerList = providers ?? [];
