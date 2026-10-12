@@ -533,6 +533,12 @@ function ProviderDashboard() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
+                      <SidebarMenuButton onClick={() => setSupportDialogOpen(true)}>
+                        <MessageSquare className="w-4 h-4" />
+                        <span>Contact Support</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
                       <SidebarMenuButton onClick={() => navigate({ to: "/settings" })}>
                         <SettingsIcon className="w-4 h-4" />
                         <span>Settings</span>
