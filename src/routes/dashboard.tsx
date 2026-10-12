@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar";
 import { RoleGate } from "@/components/RoleGate";
@@ -176,6 +176,7 @@ function ClientDashboard() {
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showMobileStats, setShowMobileStats] = useState(false);
+  const searchFormRef = useRef<HTMLDivElement>(null);
 
   // Check if user needs onboarding (disabled - profiles table doesn't have onboarding_completed column)
   // useEffect(() => {
@@ -848,7 +849,7 @@ function ClientDashboard() {
                 </div>
               </div>
 
-              <Card className="p-6 shadow-soft border-2 border-primary/20 fade-in">
+              <Card ref={searchFormRef} className="p-6 shadow-soft border-2 border-primary/20 fade-in">
                 <form onSubmit={submit} className="space-y-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
@@ -1444,11 +1445,18 @@ function ClientDashboard() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => navigate({ to: `/providers` })}
+                                onClick={() => {
+                                  setText(match.service_request?.request_text || "");
+                                  setResult(null);
+                                  setRequestedIds(new Set());
+                                  searchFormRef.current?.scrollIntoView({ behavior: "smooth" });
+                                  setTimeout(() => submitMutation.mutate(), 500);
+                                }}
+                                disabled={submitMutation.isPending}
                                 className="bg-gradient-hero text-white border-0"
                               >
                                 <Sparkles className="w-4 h-4 mr-1" />
-                                Find Other Providers
+                                Search Again
                               </Button>
                             </div>
                           </div>
