@@ -21,6 +21,9 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Vite config with secrets
+vite.config.ts
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
