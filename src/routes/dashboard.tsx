@@ -780,7 +780,7 @@ function ClientDashboard() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                      <SidebarMenuButton onClick={() => navigate({ to: "/settings" })}>
+                      <SidebarMenuButton onClick={() => navigate({ to: "/contact-support" })}>
                         <MessageSquare className="w-4 h-4" />
                         <span>Contact Support</span>
                       </SidebarMenuButton>
@@ -2085,7 +2085,7 @@ function ClientDashboard() {
                         size="sm"
                         variant="outline"
                         className="w-full text-xs"
-                        onClick={() => navigate({ to: "/settings" })}
+                        onClick={() => navigate({ to: "/contact-support" })}
                       >
                         Contact Support
                       </Button>
