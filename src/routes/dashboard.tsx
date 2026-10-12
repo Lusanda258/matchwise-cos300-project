@@ -22,7 +22,7 @@ import { matchRequest } from "@/server/match.functions";
 import { ProviderInquiryDialog } from "@/components/ProviderInquiryDialog";
 import { FavoriteProviderRequestDialog } from "@/components/FavoriteProviderRequestDialog";
 import { OnboardingDialog } from "@/components/OnboardingDialog";
-import { createProviderReport } from "@/server/report.functions";
+import { createProviderReport, getClientReports } from "@/server/report.functions";
 import { submitRating } from "@/server/rating.functions";
 import {
   addFavoriteProvider,
@@ -475,6 +475,31 @@ function ClientDashboard() {
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Failed to submit report");
+    },
+  });
+
+  // Fetch client's reports
+  const { data: clientReports = [], refetch: refetchReports } = useQuery({
+    queryKey: ["clientReports"],
+    queryFn: async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData?.session;
+      if (!session) return [];
+      const res = await getClientReports({
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      return res;
+    },
+  });
+
+  // Real-time subscription for reports
+  useRealtimeSubscription({
+    table: "provider_reports",
+    onInsert: () => {
+      refetchReports();
+    },
+    onUpdate: () => {
+      refetchReports();
     },
   });
 
@@ -1837,6 +1862,52 @@ function ClientDashboard() {
                       ))}
                     </div>
                   )}
+                </section>
+              )}
+
+              {/* Reports Section */}
+              {clientReports.length > 0 && (
+                <section id="reports-section" className="mt-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold">Your Reports</h2>
+                    <Badge variant="outline">{clientReports.length}</Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {clientReports.map((report) => (
+                      <Card key={report.id} className="p-4 shadow-card border-2">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">
+                              Report: {report.provider?.business_name || "Unknown Provider"}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {new Date(report.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              report.status === "resolved"
+                                ? "default"
+                                : report.status === "reviewed"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
+                            {report.status}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {report.report_text}
+                        </p>
+                        {report.admin_notes && (
+                          <div className="mt-2 p-2 bg-muted rounded text-xs">
+                            <p className="font-medium text-muted-foreground mb-1">Admin Notes:</p>
+                            <p className="text-foreground">{report.admin_notes}</p>
+                          </div>
+                        )}
+                      </Card>
+                    ))}
+                  </div>
                 </section>
               )}
 
