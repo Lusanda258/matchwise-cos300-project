@@ -82,10 +82,14 @@ interface SupportMessage {
   admin_id: string | null;
   created_at: string;
   updated_at: string;
-  profiles?: {
+  user?: {
     id: string;
     full_name: string;
     email: string;
+  };
+  admin?: {
+    id: string;
+    full_name: string;
   };
 }
 
@@ -688,8 +692,8 @@ function AdminDashboard() {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">
-                          From: {msg.profiles?.full_name || "Unknown"} (
-                          {msg.profiles?.email || "No email"})
+                          From: {msg.user?.full_name || "Unknown"} (
+                          {msg.user?.email || "No email"})
                         </p>
                         <p className="text-sm">{msg.message}</p>
                         <p className="text-xs text-muted-foreground mt-2">
@@ -855,7 +859,7 @@ function AdminDashboard() {
               <p className="text-sm text-muted-foreground">
                 From:{" "}
                 <span className="font-medium">
-                  {selectedSupportMessage?.profiles?.full_name || "Unknown"}
+                  {selectedSupportMessage?.user?.full_name || "Unknown"}
                 </span>
               </p>
               <p className="text-sm text-muted-foreground">

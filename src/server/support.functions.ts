@@ -70,11 +70,8 @@ export const getSupportMessages = createServerFn({ method: "GET" })
       .select(
         `
         *,
-        profiles (
-          id,
-          full_name,
-          email
-        )
+        user:profiles!user_id(id, full_name, email),
+        admin:profiles!admin_id(id, full_name)
       `,
     )
       .order("created_at", { ascending: false });
