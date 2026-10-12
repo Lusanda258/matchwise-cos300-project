@@ -16,8 +16,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { respondToInquiry } from "@/server/inquiry.functions";
+import { submitSupportMessage } from "@/server/support.functions";
 import { toast } from "sonner";
 import { useRealtimeSubscription } from "@/hooks/useRealtime";
 import {
@@ -129,6 +138,10 @@ function ProviderDashboard() {
   const queryClient = useQueryClient();
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [supportDialogOpen, setSupportDialogOpen] = useState(false);
+  const [supportSubject, setSupportSubject] = useState("");
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportPriority, setSupportPriority] = useState("medium");
 
   // Fetch provider profile
   const { data: provider, isLoading: providerLoading } = useQuery({
@@ -359,6 +372,33 @@ function ProviderDashboard() {
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Upload failed");
+    },
+  });
+
+  // Mutation for submitting support messages
+  const supportMutation = useMutation({
+    mutationFn: async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData?.session;
+      const res = await submitSupportMessage({
+        data: {
+          subject: supportSubject,
+          message: supportMessage,
+          priority: supportPriority,
+        },
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      return res;
+    },
+    onSuccess: () => {
+      toast.success("Support message sent successfully");
+      setSupportDialogOpen(false);
+      setSupportSubject("");
+      setSupportMessage("");
+      setSupportPriority("medium");
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to send support message");
     },
   });
 
@@ -1362,7 +1402,7 @@ function ProviderDashboard() {
                         size="sm"
                         variant="outline"
                         className="w-full text-xs"
-                        onClick={() => navigate({ to: "/settings" })}
+                        onClick={() => setSupportDialogOpen(true)}
                       >
                         Contact Support
                       </Button>
@@ -1374,6 +1414,81 @@ function ProviderDashboard() {
           </aside>
         </div>
       </div>
+
+      {/* Support Dialog */}
+      <Dialog open={supportDialogOpen} onOpenChange={setSupportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Contact Support</DialogTitle>
+            <DialogDescription>
+              Send a message to our support team. We'll get back to you as soon as possible.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            supportMutation.mutate();
+          }} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="support-subject">Subject</Label>
+              <Input
+                id="support-subject"
+                placeholder="Brief description of your issue"
+                value={supportSubject}
+                onChange={(e) => setSupportSubject(e.target.value)}
+                required
+                minLength={5}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="support-priority">Priority</Label>
+              <Select value={supportPriority} onValueChange={setSupportPriority}>
+                <SelectTrigger id="support-priority">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low - General inquiry</SelectItem>
+                  <SelectItem value="medium">Medium - Need assistance</SelectItem>
+                  <SelectItem value="high">High - Issue affecting usage</SelectItem>
+                  <SelectItem value="urgent">Urgent - Critical issue</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="support-message">Message</Label>
+              <Textarea
+                id="support-message"
+                placeholder="Describe your issue in detail..."
+                value={supportMessage}
+                onChange={(e) => setSupportMessage(e.target.value)}
+                required
+                minLength={10}
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSupportDialogOpen(false);
+                  setSupportSubject("");
+                  setSupportMessage("");
+                  setSupportPriority("medium");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={supportMutation.isPending}
+                className="bg-gradient-hero text-white"
+              >
+                {supportMutation.isPending ? "Sending..." : "Send Message"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </SidebarProvider>
   );
 }
