@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const SubmitSupportSchema = z.object({
@@ -21,31 +22,16 @@ const UpdateStatusSchema = z.object({
 
 // Submit a support message
 export const submitSupportMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SubmitSupportSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { request } = context;
-    const supabase = (await import("@/integrations/supabase/client.server")).supabase;
+    const { userId } = context;
 
-    // Get user from session
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-      throw new Error("Unauthorized");
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(token);
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Create support message
-    const { data: insertData, error } = await supabase
+    // Create support message using admin client to bypass RLS
+    const { data: insertData, error } = await supabaseAdmin
       .from("support_messages")
       .insert({
-        user_id: user.id,
+        user_id: userId,
         subject: data.subject,
         message: data.message,
         priority: data.priority,
@@ -61,41 +47,28 @@ export const submitSupportMessage = createServerFn({ method: "POST" })
   });
 
 // Get all support messages (admin only)
-export const getSupportMessages = createServerFn({ method: "GET" }).handler(async ({ context }) => {
-  const { request } = context;
-  const supabase = (await import("@/integrations/supabase/client.server")).supabase;
+export const getSupportMessages = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
 
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader) {
-    throw new Error("Unauthorized");
-  }
+    // Verify user is admin
+    const { data: userRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
 
-  const token = authHeader.replace("Bearer ", "");
-  const {
-    data: { user },
-  } = await supabase.auth.getUser(token);
+    if (!userRole) {
+      throw new Error("Only admins can view support messages");
+    }
 
-  if (!user) {
-    throw new Error("Unauthorized");
-  }
-
-  // Check if user is admin
-  const { data: roleData } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .eq("role", "admin")
-    .single();
-
-  if (!roleData) {
-    throw new Error("Forbidden: Admin access required");
-  }
-
-  // Get all support messages with user info
-  const { data: messagesData, error } = await supabase
-    .from("support_messages")
-    .select(
-      `
+    // Get all support messages with user info using admin client to bypass RLS
+    const { data: messagesData, error } = await supabaseAdmin
+      .from("support_messages")
+      .select(
+        `
         *,
         profiles (
           id,
@@ -104,39 +77,25 @@ export const getSupportMessages = createServerFn({ method: "GET" }).handler(asyn
         )
       `,
     )
-    .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    throw new Error(`Failed to fetch support messages: ${error.message}`);
-  }
+    if (error) {
+      throw new Error(`Failed to fetch support messages: ${error.message}`);
+    }
 
-  return messagesData;
-});
+    return messagesData;
+  });
 
 // Get user's own support messages
-export const getUserSupportMessages = createServerFn({ method: "GET" }).handler(
-  async ({ context }) => {
-    const { request } = context;
-    const supabase = (await import("@/integrations/supabase/client.server")).supabase;
+export const getUserSupportMessages = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
 
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-      throw new Error("Unauthorized");
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(token);
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    const { data: userMessagesData, error } = await supabase
+    const { data: userMessagesData, error } = await supabaseAdmin
       .from("support_messages")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -144,49 +103,34 @@ export const getUserSupportMessages = createServerFn({ method: "GET" }).handler(
     }
 
     return userMessagesData;
-  },
-);
+  });
 
 // Respond to a support message (admin only)
 export const respondToSupportMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => RespondSupportSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { request } = context;
-    const supabase = (await import("@/integrations/supabase/client.server")).supabase;
+    const { supabase, userId } = context;
 
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-      throw new Error("Unauthorized");
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(token);
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Check if user is admin
-    const { data: roleData } = await supabase
+    // Verify user is admin
+    const { data: userRole } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("role", "admin")
-      .single();
+      .maybeSingle();
 
-    if (!roleData) {
-      throw new Error("Forbidden: Admin access required");
+    if (!userRole) {
+      throw new Error("Only admins can respond to support messages");
     }
 
-    // Update support message
-    const { data: updated, error } = await supabase
+    // Update support message using admin client to bypass RLS
+    const { data: updated, error } = await supabaseAdmin
       .from("support_messages")
       .update({
         admin_response: data.response,
         status: data.status,
-        admin_id: user.id,
+        admin_id: userId,
       })
       .eq("id", data.id)
       .select()
@@ -201,38 +145,24 @@ export const respondToSupportMessage = createServerFn({ method: "POST" })
 
 // Update support message status (admin only)
 export const updateSupportMessageStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UpdateStatusSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { request } = context;
-    const supabase = (await import("@/integrations/supabase/client.server")).supabase;
+    const { supabase, userId } = context;
 
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-      throw new Error("Unauthorized");
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(token);
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Check if user is admin
-    const { data: roleData } = await supabase
+    // Verify user is admin
+    const { data: userRole } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("role", "admin")
-      .single();
+      .maybeSingle();
 
-    if (!roleData) {
-      throw new Error("Forbidden: Admin access required");
+    if (!userRole) {
+      throw new Error("Only admins can update support message status");
     }
 
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await supabaseAdmin
       .from("support_messages")
       .update({ status: data.status })
       .eq("id", data.id)
