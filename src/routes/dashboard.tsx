@@ -1456,7 +1456,7 @@ function ClientDashboard() {
                                 className="bg-gradient-hero text-white border-0"
                               >
                                 <Sparkles className="w-4 h-4 mr-1" />
-                                Search Again
+                                Find Other Providers
                               </Button>
                             </div>
                           </div>
