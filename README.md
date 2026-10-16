@@ -1,3 +1,4 @@
 Contributors:
 
--@nwayitelomongwe
+- @nwayitelomongwe
+- @Mulaudzishaunjr
