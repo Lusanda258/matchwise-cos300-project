@@ -2,3 +2,4 @@ Contributors:
 
 - @nwayitelomongwe
 - @Mulaudzishaunjr
+- @raedanindileni
